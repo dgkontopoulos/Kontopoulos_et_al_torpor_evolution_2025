@@ -1,6 +1,6 @@
 This repository contains code that reproduces the main analyses of the following study:
 
->Dimitrios - Georgios Kontopoulos, Danielle L. Levesque, and Michael Hiller: **Numerous independent gains of torpor and hibernation across endotherms, linked with adaptation to diverse environments**. 2023. [Submitted]
+>Dimitrios - Georgios Kontopoulos, Danielle L. Levesque, and Michael Hiller: **Numerous independent gains of torpor and hibernation across endotherms, linked with adaptation to diverse environments**. 2024. [Submitted]
 
 ---
  
