@@ -2,7 +2,7 @@
 
 # This script first calculates the median posterior value and 95% HPD 
 # interval per response variable per species. It then generates a table 
-# of those values for dormancy-capable species only, and performs a 
+# of those values for torpor-capable species only, and performs a 
 # phylogenetic principal components analysis (pPCA). Last, it clusters 
 # the resulting pPCA scores to identify groups of species that occupy 
 # similar regions of the ecophysiological parameter space.
@@ -150,8 +150,8 @@ extract_median_and_95_HPD_per_taxon_and_response <- function(working_dir)
 }
 
 # This function performs a phylogenetic principal components analysis 
-# (pPCA) of all ecophysiological variables except for dormancy across 
-# dormancy-capable species only. It uses the matrix obtained from the 
+# (pPCA) of all ecophysiological variables except for torpor across 
+# torpor-capable species only. It uses the matrix obtained from the 
 # previous function above.
 run_ppca <- function(working_dir, posterior_dataset_all_taxa)
 {
@@ -164,18 +164,18 @@ run_ppca <- function(working_dir, posterior_dataset_all_taxa)
 	# Read the phylogeny.
 	tree <- read.tree('../Data/time_calibrated_phylogeny.nwk')
 	
-	# Remove dormancy-incapable species from the posterior matrix and 
+	# Remove torpor-incapable species from the posterior matrix and 
 	# from the phylogeny.
 	torpid_sp <- dataset$Species[
 		!is.na(dataset$Species) & 
-		dataset$Dormancy %in% c('Torpor', 'Hibernation')
+		dataset$Torpor %in% c('Torpor', 'Hibernation')
 	]
 	posterior_dataset_tips <- posterior_dataset_all_taxa[
 		row.names(posterior_dataset_all_taxa) %in% torpid_sp,
 	]
 	posterior_dataset_tips <- subset(
 		posterior_dataset_tips, select = -c(
-			median_Dormancy, HPD_95_l_Dormancy, HPD_95_u_Dormancy
+			median_Torpor, HPD_95_l_Torpor, HPD_95_u_Torpor
 		)
 	)
 
@@ -220,5 +220,5 @@ working_dir <- args[1]
 posterior_dataset_all_taxa <- extract_median_and_95_HPD_per_taxon_and_response(working_dir)
 
 # Apply a phylogenetic PCA to the above table across extant, 
-# dormancy-capable species only.
+# torpor-capable species only.
 run_ppca(working_dir, posterior_dataset_all_taxa)

@@ -1,10 +1,10 @@
 #!/usr/bin/env Rscript
 
 # This script fits a model with MCMCglmm to estimate the correlation 
-# structure among dormancy and 21 ecophysiological variables across 
+# structure among torpor and 21 ecophysiological variables across 
 # 1,338 endotherms, accounting for phylogeny. 3 of these variables 
 # (BMR, brain mass, and maximum longevity) are corrected for body mass. 
-# Furthermore, in this script, some dormancy-incapable mammals are 
+# Furthermore, in this script, some torpor-incapable mammals are 
 # randomly shifted to either daily torpor or hibernation. 
 #
 # 30 different chains have been specified in this script, allowing the 
@@ -14,15 +14,15 @@
 #	   body mass of the last common ancestor of Amniota.
 #
 # The script needs to be run from the command line, with the user 
-# providing the chain ID. The number of dormancy-incapable mammals 
-# that are randomly shifted to dormancy needs to also be provided by the 
+# providing the chain ID. The number of torpor-incapable mammals 
+# that are randomly shifted to torpor needs to also be provided by the 
 # user (second argument), as well as the random seed (third argument):
 #
-# Rscript fit_MCMCglmm_with_body_mass_corrections_with_some_dormancy_incapable_mammals_shifted_to_dormancy.R 1 20 1
-# Rscript fit_MCMCglmm_with_body_mass_corrections_with_some_dormancy_incapable_mammals_shifted_to_dormancy.R 2 20 1
+# Rscript fit_MCMCglmm_with_body_mass_corrections_with_some_torpor_incapable_mammals_shifted_to_torpor.R 1 20 1
+# Rscript fit_MCMCglmm_with_body_mass_corrections_with_some_torpor_incapable_mammals_shifted_to_torpor.R 2 20 1
 # ...
-# Rscript fit_MCMCglmm_with_body_mass_corrections_with_some_dormancy_incapable_mammals_shifted_to_dormancy.R 29 20 1
-# Rscript fit_MCMCglmm_with_body_mass_corrections_with_some_dormancy_incapable_mammals_shifted_to_dormancy.R 30 20 1
+# Rscript fit_MCMCglmm_with_body_mass_corrections_with_some_torpor_incapable_mammals_shifted_to_torpor.R 29 20 1
+# Rscript fit_MCMCglmm_with_body_mass_corrections_with_some_torpor_incapable_mammals_shifted_to_torpor.R 30 20 1
 #
 # This script will run for a few days depending on the CPU (~7.5 days on 
 # an AMD EPYC 7702 CPU core) and will need ~67 GB of memory. In the end, 
@@ -52,8 +52,8 @@ prepare_vars_for_MCMCglmm <- function(chain_id, random_shifts, user_seed)
 	
 	# Convert categorical variables to binary factors or ordered factors.
 
-	dataset$Dormancy <- factor(
-		dataset$Dormancy, levels = c('NO', 'Torpor', 'Hibernation')
+	dataset$Torpor <- factor(
+		dataset$Torpor, levels = c('NO', 'Torpor', 'Hibernation')
 	)
 	
 	dataset$Migratory <- factor(
@@ -273,18 +273,18 @@ prepare_vars_for_MCMCglmm <- function(chain_id, random_shifts, user_seed)
 	)
 
 	# Find the indices of placental mammals that are listed as 
-	# dormancy-incapable in our dataset.
-	placental_mammals_without_dormancy <- which(
+	# torpor-incapable in our dataset.
+	placental_mammals_without_torpor <- which(
 		!is.na(dataset$Species) &
 		dataset$Species %in% placental_mammals &
-		dataset$Dormancy == 'NO'
+		dataset$Torpor == 'NO'
 	)
 	
 	# Randomly shift some of those (number set by the user) to either 
 	# daily torpor or hibernation.
 	set.seed(user_seed)
-	dataset$Dormancy[
-		sample(placental_mammals_without_dormancy, random_shifts)
+	dataset$Torpor[
+		sample(placental_mammals_without_torpor, random_shifts)
 	] <- sample(c('Torpor', 'Hibernation'), random_shifts, replace = TRUE)
 	
 	# Return all the necessary variables for model fitting.
@@ -321,7 +321,7 @@ fit <- MCMCglmm(
 		log(Body_mass_g), log(BMR_Watt_mass_corrected), log(Brain_size_g_mass_corrected), 
 		log(Max_longevity_years_mass_corrected), I(Range_size_km2^(1/5)), sqrt(Absolute_latitude),
 		Mean_temp, I(SD_temp^(1/3)), log(Annual_precip), I(CV_precip^(1/4)), I(NPP^(1/3)),
-		Dormancy, Migratory, Carnivory, Herbivory, Fossoriality, Aquatic_affinity, 
+		Torpor, Migratory, Carnivory, Herbivory, Fossoriality, Aquatic_affinity, 
 		Hemisphere, Cathemeral, Crepuscular, Diurnal, Nocturnal
 	) ~ trait - 1,
 	

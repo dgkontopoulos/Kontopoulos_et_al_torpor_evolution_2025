@@ -1,11 +1,11 @@
 #!/usr/bin/env Rscript
 
-# This script fits 12 variants of the Mk model to the dormancy data 
+# This script fits 12 variants of the Mk model to the torpor data 
 # and performs model averaging on the basis of AIC weights.
 #
 # Based on the result, it then reconstructs the ancestral states of 
-# dormancy for all internal nodes and identifies branches in which 
-# direct shifts between no dormancy and hibernation have occurred.
+# torpor for all internal nodes and identifies branches in which 
+# direct shifts between no torpor and hibernation have occurred.
 
 library(geiger)
 library(phytools)
@@ -29,7 +29,7 @@ determine_optimum_lambda <- function(tree, x, model)
 }
 
 # This function fits all 12 Mk model variants and performs model averaging.
-fit_models <- function(tree, dormancy)
+fit_models <- function(tree, torpor)
 {
 	
 	# Fit each Mk variant separately and calculate the AIC.
@@ -37,19 +37,19 @@ fit_models <- function(tree, dormancy)
 	# All transition rates are equal.
 	cat('Now fitting the Mk_ER variant...\n')
 	set.seed(1)
-	fit_Mk_ER <- fitMk(tree, dormancy, model = 'ER', pi='fitzjohn', lik.func="pruning")
+	fit_Mk_ER <- fitMk(tree, torpor, model = 'ER', pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_ER <- AIC(fit_Mk_ER)
 	
 	# Forward and backward transition rates are equal.
 	cat('Now fitting the Mk_SYM variant...\n')
 	set.seed(2)
-	fit_Mk_SYM <- fitMk(tree, dormancy, model = 'SYM', pi='fitzjohn', lik.func="pruning")
+	fit_Mk_SYM <- fitMk(tree, torpor, model = 'SYM', pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_SYM <- AIC(fit_Mk_SYM)
 	
 	# All transition rates can differ from each other.
 	cat('Now fitting the Mk_ARD variant...\n')
 	set.seed(3)
-	fit_Mk_ARD <- fitMk(tree, dormancy, model = 'ARD', pi='fitzjohn', lik.func="pruning")
+	fit_Mk_ARD <- fitMk(tree, torpor, model = 'ARD', pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_ARD <- AIC(fit_Mk_ARD)
 	
 	# For Mk variants with the lambda parameter, we need to first 
@@ -58,70 +58,70 @@ fit_models <- function(tree, dormancy)
 	# Equal transition rates + lambda transformation.
 	cat('Now fitting the Mk_ER_lambda variant...\n')
 	set.seed(4)
-	lambda_Mk_ER <- determine_optimum_lambda(tree, dormancy, model = 'ER')
-	fit_Mk_ER_lambda <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_ER), dormancy, model = 'ER', pi='fitzjohn', lik.func="pruning")
+	lambda_Mk_ER <- determine_optimum_lambda(tree, torpor, model = 'ER')
+	fit_Mk_ER_lambda <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_ER), torpor, model = 'ER', pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_ER_lambda <- -2 * fit_Mk_ER_lambda$logLik + 2 * (attr(logLik(fit_Mk_ER_lambda), 'df') + 1)
 	
 	# Equal forward/backward transition rates + lambda transformation.
 	cat('Now fitting the Mk_SYM_lambda variant...\n')
 	set.seed(5)
-	lambda_Mk_SYM <- determine_optimum_lambda(tree, dormancy, model = 'SYM')
-	fit_Mk_SYM_lambda <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_SYM), dormancy, model = 'SYM', pi='fitzjohn', lik.func="pruning")
+	lambda_Mk_SYM <- determine_optimum_lambda(tree, torpor, model = 'SYM')
+	fit_Mk_SYM_lambda <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_SYM), torpor, model = 'SYM', pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_SYM_lambda <- -2 * fit_Mk_SYM_lambda$logLik + 2 * (attr(logLik(fit_Mk_SYM_lambda), 'df') + 1)
 	
 	# Different transition rates + lambda transformation.
 	cat('Now fitting the Mk_ARD_lambda variant...\n')
 	set.seed(6)
-	lambda_Mk_ARD <- determine_optimum_lambda(tree, dormancy, model = 'ARD')
-	fit_Mk_ARD_lambda <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_ARD), dormancy, model = 'ARD', pi='fitzjohn', lik.func="pruning")
+	lambda_Mk_ARD <- determine_optimum_lambda(tree, torpor, model = 'ARD')
+	fit_Mk_ARD_lambda <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_ARD), torpor, model = 'ARD', pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_ARD_lambda <- -2 * fit_Mk_ARD_lambda$logLik + 2 * (attr(logLik(fit_Mk_ARD_lambda), 'df') + 1)
 
-	# For Mk variants that do not allow direct shifts between no dormancy 
+	# For Mk variants that do not allow direct shifts between no torpor 
 	# and hibernation, we need to provide a custom transition rate matrix.
 	
-	# Equal transition rates + lack of shifts between no dormancy and hibernation.
+	# Equal transition rates + lack of shifts between no torpor and hibernation.
 	cat('Now fitting the Mk_ER_ordered variant...\n')
 	set.seed(7)
 	matrix_ER <-matrix(c(0,0,1,0,0,1,1,1,0),3,3,byrow=TRUE,
 	    dimnames=list(c("Hibernation","NO","Torpor"),c("Hibernation","NO","Torpor")))
-	fit_Mk_ER_ordered <- fitMk(tree, dormancy, model = matrix_ER, pi='fitzjohn', lik.func="pruning")
+	fit_Mk_ER_ordered <- fitMk(tree, torpor, model = matrix_ER, pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_ER_ordered <- AIC(fit_Mk_ER_ordered)
 	
-	# Equal forward/backward transition rates + lack of shifts between no dormancy and hibernation.
+	# Equal forward/backward transition rates + lack of shifts between no torpor and hibernation.
 	cat('Now fitting the Mk_SYM_ordered variant...\n')
 	set.seed(8)
 	matrix_SYM <-matrix(c(0,0,1,0,0,2,1,2,0),3,3,byrow=TRUE,
 	    dimnames=list(c("Hibernation","NO","Torpor"),c("Hibernation","NO","Torpor")))
-	fit_Mk_SYM_ordered <- fitMk(tree, dormancy, model = matrix_SYM, pi='fitzjohn', lik.func="pruning")
+	fit_Mk_SYM_ordered <- fitMk(tree, torpor, model = matrix_SYM, pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_SYM_ordered <- AIC(fit_Mk_SYM_ordered)
 	
-	# Different transition rates + lack of shifts between no dormancy and hibernation.
+	# Different transition rates + lack of shifts between no torpor and hibernation.
 	cat('Now fitting the Mk_ARD_ordered variant...\n')
 	set.seed(9)
 	matrix_ARD <-matrix(c(0,0,1,0,0,2,3,4,0),3,3,byrow=TRUE,
 	    dimnames=list(c("Hibernation","NO","Torpor"),c("Hibernation","NO","Torpor")))
-	fit_Mk_ARD_ordered <- fitMk(tree, dormancy, model = matrix_ARD, pi='fitzjohn', lik.func="pruning")
+	fit_Mk_ARD_ordered <- fitMk(tree, torpor, model = matrix_ARD, pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_ARD_ordered <- AIC(fit_Mk_ARD_ordered)
 	
-	# Equal transition rates + lambda transformation + lack of shifts between no dormancy and hibernation.
+	# Equal transition rates + lambda transformation + lack of shifts between no torpor and hibernation.
 	cat('Now fitting the Mk_ER_lambda_ordered variant...\n')
 	set.seed(10)
-	lambda_Mk_ER_ordered <- determine_optimum_lambda(tree, dormancy, model = matrix_ER)
-	fit_Mk_ER_lambda_ordered <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_ER_ordered), dormancy, model = matrix_ER, pi='fitzjohn', lik.func="pruning")
+	lambda_Mk_ER_ordered <- determine_optimum_lambda(tree, torpor, model = matrix_ER)
+	fit_Mk_ER_lambda_ordered <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_ER_ordered), torpor, model = matrix_ER, pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_ER_lambda_ordered <- -2 * fit_Mk_ER_lambda_ordered$logLik + 2 * (attr(logLik(fit_Mk_ER_lambda_ordered), 'df') + 1)
 	
-	# Equal forward/backward transition rates + lambda transformation + lack of shifts between no dormancy and hibernation.
+	# Equal forward/backward transition rates + lambda transformation + lack of shifts between no torpor and hibernation.
 	cat('Now fitting the Mk_SYM_lambda_ordered variant...\n')
 	set.seed(11)
-	lambda_Mk_SYM_ordered <- determine_optimum_lambda(tree, dormancy, model = matrix_SYM)
-	fit_Mk_SYM_lambda_ordered <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_SYM_ordered), dormancy, model = matrix_SYM, pi='fitzjohn', lik.func="pruning")
+	lambda_Mk_SYM_ordered <- determine_optimum_lambda(tree, torpor, model = matrix_SYM)
+	fit_Mk_SYM_lambda_ordered <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_SYM_ordered), torpor, model = matrix_SYM, pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_SYM_lambda_ordered <- -2 * fit_Mk_SYM_lambda_ordered$logLik + 2 * (attr(logLik(fit_Mk_SYM_lambda_ordered), 'df') + 1)
 	
-	# Different transition rates + lambda transformation + lack of shifts between no dormancy and hibernation.
+	# Different transition rates + lambda transformation + lack of shifts between no torpor and hibernation.
 	cat('Now fitting the Mk_ARD_lambda_ordered variant...\n')
 	set.seed(12)
-	lambda_Mk_ARD_ordered <- determine_optimum_lambda(tree, dormancy, model = matrix_ARD)
-	fit_Mk_ARD_lambda_ordered <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_ARD_ordered), dormancy, model = matrix_ARD, pi='fitzjohn', lik.func="pruning")
+	lambda_Mk_ARD_ordered <- determine_optimum_lambda(tree, torpor, model = matrix_ARD)
+	fit_Mk_ARD_lambda_ordered <- fitMk(phytools:::lambdaTree(tree, lambda_Mk_ARD_ordered), torpor, model = matrix_ARD, pi='fitzjohn', lik.func="pruning")
 	AIC_fit_Mk_ARD_lambda_ordered <- -2 * fit_Mk_ARD_lambda_ordered$logLik + 2 * (attr(logLik(fit_Mk_ARD_lambda_ordered), 'df') + 1)
 	
 	cat('Calculating AIC weights and doing model averaging...\n')
@@ -188,10 +188,10 @@ lk.lambda <- function(lambda, tree, x, ...)
 	)
 }
 
-# This function reconstructs the ancestral states of dormancy across 
+# This function reconstructs the ancestral states of torpor across 
 # the phylogeny and detects apparent direct transitions between no 
-# dormancy and hibernation.
-reconstruct_ancestral_states <- function(tree, dormancy)
+# torpor and hibernation.
+reconstruct_ancestral_states <- function(tree, torpor)
 {
 	
 	# Load the Mk model fitting results.
@@ -200,21 +200,21 @@ reconstruct_ancestral_states <- function(tree, dormancy)
 	# Perform 10,000 stochastic character mapping simulations based on 
 	# the model-averaged parameters.
 	simulated_trees <- make.simmap(
-		tree, x = dormancy, Q = results$averaged_Q_matrix,
+		tree, x = torpor, Q = results$averaged_Q_matrix,
 		pi = results$averaged_pi, nsim = 10000
 	)
 	
-	# Get the dormancy probabilities for each node and write them to 
+	# Get the torpor probabilities for each node and write them to 
 	# an output file.
 	model_estimates <- describe.simmap(simulated_trees)$ace
 	
 	write.csv(
 		model_estimates,
-		file = '../Results/dormancy_probabilities_Mk.csv'
+		file = '../Results/torpor_probabilities_Mk.csv'
 	)
 	
 	# Initialise a data frame to store the frequency of direct transitions 
-	# between no dormancy and hibernation for each branch across all 
+	# between no torpor and hibernation for each branch across all 
 	# simulations.
 	transitions_between_NO_and_Hibernation <- data.frame(
 		edge = 1:2625,
@@ -230,12 +230,12 @@ reconstruct_ancestral_states <- function(tree, dormancy)
 		for ( j in 1:2625 )
 		{
 			
-			# ... check if there are at least two observed dormancy states.
+			# ... check if there are at least two observed torpor states.
 			if ( length(simulated_trees[[i]]$maps[[j]]) >= 2 )
 			{
 				
-				# Read the dormancy states along the branch and check if 
-				# a direct shift from no dormancy to hibernation has 
+				# Read the torpor states along the branch and check if 
+				# a direct shift from no torpor to hibernation has 
 				# occurred.
 				#
 				# If yes, increase the relevant counter in the data frame.
@@ -258,7 +258,7 @@ reconstruct_ancestral_states <- function(tree, dormancy)
 	}
 	
 	# The lines below do the exact same thing as above, but for direct 
-	# shifts from hibernation to lack of dormancy.
+	# shifts from hibernation to lack of torpor.
 	for ( i in 1:10000 )
 	{
 		for ( j in 1:2625 )
@@ -320,13 +320,13 @@ dataset$Species <- gsub(' ', '_', dataset$Species)
 tree <- read.tree('../Data/time_calibrated_phylogeny.nwk')
 tree$node.label <- (length(tree$tip.label) + 1):((length(tree$tip.label)) + tree$Nnode)
 
-# Prepare a dormancy factor for Mk model fitting.
-dormancy <- factor(dataset$Dormancy)
-names(dormancy) <- dataset$Species
+# Prepare a torpor factor for Mk model fitting.
+torpor <- factor(dataset$Torpor)
+names(torpor) <- dataset$Species
 
 # Fit all Mk model variants.
-fit_models(tree, dormancy)
+fit_models(tree, torpor)
 
 # Perform stochastic character mapping simulations to reconstruct ancestral
-# states and detect direct shifts between no dormancy and hibernation.
-reconstruct_ancestral_states(tree, dormancy)
+# states and detect direct shifts between no torpor and hibernation.
+reconstruct_ancestral_states(tree, torpor)

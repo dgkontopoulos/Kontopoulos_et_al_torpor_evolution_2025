@@ -1,6 +1,6 @@
 This repository contains code that reproduces the main analyses of the following study:
 
->Dimitrios - Georgios Kontopoulos, Danielle L. Levesque, and Michael Hiller: **Numerous independent gains of torpor and hibernation across endotherms, linked with adaptation to diverse environments**. 2024. [Submitted]
+>Dimitrios - Georgios Kontopoulos, Danielle L. Levesque, and Michael Hiller: **Numerous independent gains of daily torpor and hibernation across endotherms, linked with adaptation to diverse environments**. 2024. [Submitted]
 
 ---
  
@@ -27,7 +27,7 @@ as a rough guide (but also read the information at the top of each script):
 9. extract_threshold_between_daily_torpor_and_hibernation.R
 10. extract_correlations.R
 11. run_phylogenetic_pca.R
-12. fit_Mk_variants_with_some_dormancy_incapable_mammals_shifted_to_dormancy.R
-13. fit_MCMCglmm_with_body_mass_corrections_with_some_dormancy_incapable_mammals_shifted_to_dormancy.R
+12. fit_Mk_variants_with_some_torpor_incapable_mammals_shifted_to_torpor.R
+13. fit_MCMCglmm_with_body_mass_corrections_with_some_torpor_incapable_mammals_shifted_to_torpor.R
 14. check_ESS_PSRF.R
-15. extract_dormancy_probabilities.R
+15. extract_torpor_probabilities.R

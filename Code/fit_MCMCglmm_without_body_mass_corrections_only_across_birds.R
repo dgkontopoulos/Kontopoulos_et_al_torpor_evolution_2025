@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # This script fits a model with MCMCglmm to estimate the correlation 
-# structure among dormancy and 21 ecophysiological variables across 
+# structure among torpor and 21 ecophysiological variables across 
 # 601 birds, accounting for phylogeny.
 #
 # 5 different chains have been specified in this script, allowing the 
@@ -43,8 +43,8 @@ prepare_vars_for_MCMCglmm <- function()
 	
 	# Convert categorical variables to binary factors or ordered factors.
 
-	dataset$Dormancy <- factor(
-		dataset$Dormancy, levels = c('NO', 'Torpor', 'Hibernation')
+	dataset$Torpor <- factor(
+		dataset$Torpor, levels = c('NO', 'Torpor', 'Hibernation')
 	)
 	
 	dataset$Migratory <- factor(
@@ -198,7 +198,7 @@ fit <- MCMCglmm(
 		log(Body_mass_g), log(BMR_Watt), log(Brain_size_g), 
 		log(Max_longevity_years), I(Range_size_km2^(1/5)), sqrt(Absolute_latitude),
 		Mean_temp, I(SD_temp^(1/3)), log(Annual_precip), I(CV_precip^(1/4)), I(NPP^(1/3)),
-		Dormancy, Migratory, Carnivory, Herbivory, Fossoriality, Aquatic_affinity, 
+		Torpor, Migratory, Carnivory, Herbivory, Fossoriality, Aquatic_affinity, 
 		Hemisphere, Cathemeral, Crepuscular, Diurnal, Nocturnal
 	) ~ trait - 1,
 	
