@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/730235641.svg)](https://doi.org/10.5281/zenodo.14385989)
+
 This repository contains code that reproduces the main analyses of the following study:
 
 >Dimitrios - Georgios Kontopoulos, Danielle L. Levesque, and Michael Hiller: **Numerous independent gains of daily torpor and hibernation across endotherms, linked with adaptation to diverse environments**. 2024. [Submitted]
