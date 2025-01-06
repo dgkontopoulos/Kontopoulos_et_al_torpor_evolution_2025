@@ -2,7 +2,7 @@
 
 This repository contains code that reproduces the main analyses of the following study:
 
->Dimitrios - Georgios Kontopoulos, Danielle L. Levesque, and Michael Hiller: **Numerous independent gains of daily torpor and hibernation across endotherms, linked with adaptation to diverse environments**. 2024. [Submitted]
+>Dimitrios - Georgios Kontopoulos, Danielle L. Levesque, and Michael Hiller: [**Numerous independent gains of daily torpor and hibernation across endotherms, linked with adaptation to diverse environments.**](https://doi.org/10.1111/1365-2435.14739) 2025. *Functional Ecology*.
 
 ---
  
